@@ -1,20 +1,19 @@
 import { Association, DataTypes, Model, Optional, UUIDV4 } from "sequelize";
+import { Field, Int, ObjectType } from "type-graphql";
 import sequelize from "../database";
-import Post from "./Post";
-import User from "./User";
+
 interface CommentAttributes {
-  id: String;
-  userId?: Number;
-  text: String;
-  postId?: Number;
-  name?: String;
-  // email: String;
-  // password: String
+  id: number;
+  userId: number;
+  postId: number;
+  name: string;
+  text: string;
 }
 
-interface PostCreationAttributes extends Optional<CommentAttributes, "id"> {}
+interface ComentCreationAttributes extends Optional<CommentAttributes, "id"> {}
+@ObjectType()
 class Comment
-  extends Model<CommentAttributes, PostCreationAttributes>
+  extends Model<CommentAttributes, ComentCreationAttributes>
   implements CommentAttributes
 {
   /**
@@ -22,84 +21,50 @@ class Comment
    * This method is not a part of Sequelize lifecycle.
    * The `models/index` file will call this method automatically.
    */
-  id!: String;
-  text!: String;
-  userId!: Number;
-  postId!: Number;
-  name?: String;
-  // email!: String;
-  // password!: String
 
-  public static associations: {
-    userId: Association<User, Comment>;
-  };
+  @Field(() => Int)
+  id!: number;
+  @Field(() => Int)
+  userId!: number;
+  @Field(() => Int)
+  postId!: number;
+  @Field(() => String)
+  name!: string;
+  @Field(() => String)
+  text!: string;
+
   // public static associations: {
   //   roleId: Association<Comment, Role>;
   // };
-  // static associate() {
-  //   // define association here
-  //   Comment.belongsTo(Role, {
-  //     as: "role",
-  //     foreignKey: "roleId",
-  //   }),
-  //     Comment.hasMany(Comment, {
-  //       as: "posts",
-  //       foreignKey: "PostId",
-  //     })
-  // }
 }
 Comment.init(
   {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: UUIDV4,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       allowNull: false,
       primaryKey: true,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    postId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     text: {
       type: DataTypes.STRING,
-    },
-    userId: {
-      type: DataTypes.UUID,
-      defaultValue: UUIDV4,
       allowNull: false,
-      primaryKey: true,
-    },
-    postId: {
-      type: DataTypes.UUID,
-      defaultValue: UUIDV4,
-      allowNull: false,
-      primaryKey: true,
     },
   },
   {
     sequelize,
-    modelName: "comments",
+    modelName: "Comment",
   }
 );
-
-User.hasMany(Comment, {
-  as: "user_comments",
-  foreignKey: "userId",
-});
-Post.hasMany(Comment, {
-  as: "post_comments",
-  foreignKey: "postId",
-});
-Comment.belongsTo(Post, {
-  as: "post_comments",
-  foreignKey: "postId",
-});
-Comment.belongsTo(User, {
-  as: "user_comments",
-  foreignKey: "userId",
-});
-
-// User.hasMany(Comment);
-// Post.hasMany(Comment);
-// Comment.belongsTo(Post);
-// Comment.belongsTo(User);
 export default Comment;

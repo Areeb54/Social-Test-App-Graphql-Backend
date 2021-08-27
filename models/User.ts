@@ -1,14 +1,24 @@
-import { Association, DataTypes, Model, Optional, UUIDV4 } from "sequelize";
+import {
+  Association,
+  DataTypes,
+  INTEGER,
+  Model,
+  Optional,
+  UUIDV4,
+} from "sequelize";
+import { Field, ObjectType } from "type-graphql";
 import sequelize from "../database";
 
 interface UserAttributes {
-  id: String;
+  id: Number;
   name: String;
   email: String;
   password: String;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, "id"> {}
+
+@ObjectType()
 class User
   extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes
@@ -18,20 +28,27 @@ class User
    * This method is not a part of Sequelize lifecycle.
    * The `models/index` file will call this method automatically.
    */
-  id!: String;
-  name!: String;
-  email!: String;
-  password!: String;
+
+  @Field(() => String)
+  id!: number;
+  @Field(() => String)
+  name!: string;
+  @Field(() => String)
+  email!: string;
+  @Field(() => String)
+  password!: string;
+  @Field(() => String)
+  token!: string;
 
   // public static associations: {
-  //   roleId: Association<User, Role>;
+  //   roleId: Association<User, Role>;=
   // };
 }
 User.init(
   {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: UUIDV4,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       allowNull: false,
       primaryKey: true,
     },
@@ -52,7 +69,8 @@ User.init(
   },
   {
     sequelize,
-    modelName: "users",
+    modelName: "Users",
+    tableName: "Users",
   }
 );
 export default User;
